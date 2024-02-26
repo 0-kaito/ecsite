@@ -1,0 +1,50 @@
+@charset "UTF-8";
+
+/* ボディ全体のマージン/パディングをリセット */
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/*typeがnumberのinputを右寄りに設定*/
+input[type="number"] {
+  text-align:right;
+  }
+
+/* ヘッダーをフレックスボックスコンテナに設定 */
+header {
+    display: flex;
+    background: green;
+    color: white;
+    height: 70px;
+}
+
+header h1 {
+    margin: 0;
+    margin-left: 20px;
+}
+
+
+header div {
+    margin-left: auto;
+    margin-right: 20px;
+    margin-top: 10px;
+    text-align: right;
+}
+
+  /*ユーザー名とパスワードのimputの幅を設定*/
+input[name=userName] {
+    width: 100px; 
+}
+
+/* デフォルトのテーブルデザイン設定 */
+table {
+    margin: 20px;
+    border-collapse: collapse; 
+}
+
+/* テーブル内の td と th の枠線を設定 */
+table td, table th {
+    border: 1px solid grey;
+}
+

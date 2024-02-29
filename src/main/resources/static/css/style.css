@@ -100,6 +100,7 @@ td input {
 table#cart thead tr th,
 table#history thead tr th {
     background: #c0c0c0 !important;
+    color:black
 }
 
 /* 履歴テーブルのthead内のtrと、thの子要素に対してデザインを設定 */

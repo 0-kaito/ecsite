@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<link href="/css/style.css" rel="stylesheet">
+<title>ECサイト</title>
+
+<script>
+  document.addEventListener('DOMContentLoaded',event => {
+    
+    document.getElementByID("loginForm").addEventListener("submit",login);
+  });
+  
+  function login(event) {
+    
+  }
+</script>
+
+</head>
+<body>
+  
+  <header>
+    <h1>ECサイト</h1>
+    <div>
+      <form name="loginForm" id="loginForm" method="post" action="#">
+        ユーザー名:<input type="text" name="userName" />
+        パスワード:<input type="password" name="password" />
+        <button type="submit">ログイン</button>
+      </form>
+      <span id="welcome">ようこそ！　ゲストさん</span>
+     <input type="hidden" id="hiddenUserId" value="0" />
+    </div>
+  </header>
+
+  <table id="goodsListTable">
+    <thead>
+      <tr>
+      <th>ID</th><th>商品名</th><th>価格</th><th>注文数</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="item: ${goods}">
+        <td th:text="${item.id}" />
+         <td th:text="${item.goodsName}" />
+          <td th:text="${item.price}" />
+          <td><input type="number" class="count" value="0"/></td>
+          <td><button class="cartBtn">カートに入れる</button></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <fieldset>
+    <legend>カート</legend>
+    <table id="cart">
+      <thead>
+        <tr>
+          <th>ID</th><th>商品名</th><th>価格</th><th>注文数</th><th>カート</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+      </tbody>
+    </table>
+    <button id="purchaseBtn">購入</button>
+  </fieldset>
+
+<fieldset>
+  <legend>購入履歴</legend>
+  <table id="history">
+    <thead>
+      <tr>
+        <th>商品名</th><th>注文数</th><th>購入日時</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+    </tbody>
+  </table>
+  <button id="historyBtn">履歴を表示</button>
+</fieldset>
+</body>
+</html>

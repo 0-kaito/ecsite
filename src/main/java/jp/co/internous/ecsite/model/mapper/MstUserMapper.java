@@ -9,7 +9,7 @@ import jp.co.internous.ecsite.model.form.LoginForm;
 @Mapper
 public interface MstUserMapper {
 
-    @Select("SELECT * FROM mst_user WHERE user_name = #{userName} AND password = #{password}") // 正しいSQLとスペル
+    @Select("SELECT * FROM mst_user WHERE user_name = #{userName} AND password = #{password}") 
     MstUser findByUserNameAndPassword(LoginForm form);
 
 }

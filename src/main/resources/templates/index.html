@@ -6,15 +6,134 @@
 <title>ECサイト</title>
 
 <script>
-  document.addEventListener('DOMContentLoaded',event => {
-    
-    document.getElementByID("loginForm").addEventListener("submit",login);
-  });
   
-  function login(event) {
+  let cartList = [];
+  document.addEventListener('DOMContentLoaded', event => {
+    document.getElementById("loginForm").addEventListener("submit", login);
     
+    const cartBtns = document.querSelectorAll("submit",login);
+    
+    cartBtns.forEach((btn) => {
+      bin.addEventListener("click",addCart);
+    });
+     
+  });
+
+function initCart() {
+  //カート表を初期化する
+  const tbody = document.querySelector("#cart tbody");
+  while(tbody.lastChild){
+    tobody.removeChild(tbody.lastChild);
   }
+}
+
+  function login(event) {
+    //HTMLフォームのデフォルト動作(ページ遷移)が発生しないようprevent(阻止)する
+    event.preventDefault();
+
+    //カートテーブルをクリアし、メモリー上のカート配列も初期化する
+    initCart();
+    cartList = [];
+
+
+
+    const postObj = {
+      "userName": document.querySelector("input[name=userName]").value,
+      "password": document.querySelector("input[name=password]").value,
+    };
+
+    fetch("/ecsite/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(postObj),
+      })
+      .then(response => response.text())
+      .then(result => {
+        const user = JSON.parse(result);
+        document.getElementById("welcome").innerText = `ようこそ！ ${user.fullName} さん`;
+        document.getElementById("hiddenUserId").value = user.id;
+        document.querySelector("input[name=userName]").value = "";
+        document.querySelector("input[name=password]").value = "";
+      })
+      .catch(error => {
+        console.error("Error", error);
+      });
+  }
+  
+  function addCart(event) {
+    
+    //カートの追加ボタンの親要素のさらに親要素から、"td"要素を全て抽出し、taListに格納する
+     const tdList = event.target.parentElement.parentElement.querySelectorAll("td");
+    
+    //tdListから、商品情報を習得し、JSオブジェクト(key: value)形式でgoodsINfoに代入する
+    const goodsInfo = {
+      "id": tdList.item(0).innerText,
+      "goodsName": tdList.item(1).innerText,
+      "price": tdList.item(2).innerText,
+      "count": tdList.item(3).querySelector("input").value
+    };
+    
+    if(goodsInfo.count === "0" || goodsInfo.count === ""){
+      alert("注文数0または空欄です。");
+      returm;//注文数が0ならば、ここで関数の処理終了
+    }
+    
+    //グローバル変数 cartListに対して、カート追加対象の商品情報をpushする
+    cartList.push(goodsInfo);
+    
+    //カート表ではゼロから再構築するため、tbody内の要素をクリアする
+    initCart();
+    
+    //グローバル変数cartListをループさせカート表を再構築する
+    cartList.forEach(cart => {
+      //行(tr)作成
+      const tr = document.createElement("tr");
+      //cartオブジェクトを[key,value]でループさせ、個々のtd要素を作成し、ｔｒに追加する(本処理ではkeyは未使用)
+      for([key,value] of Object.entries(cart)){
+        
+        const td = document.createElement("td");
+        td.innerText = value;
+        tr.appendChild(td);
+      }
+      
+      //カート削除ボタンを作成する
+      const removeBtn = document.createElement("button");
+      removeBtn.innerText = "カート削除";
+      //カート削除ボタンにclass属性を設定する
+      removeBtn.setAttribute("class","removeBtn");
+      //カート削除ボタンに対し、click時にイベントリスナーを追加する
+      removeBtn.addEventListener("click",removeCart);
+      
+      //td要素を作成し、カート削除ボタンを子要素として追加する
+      const td = document.createElement("td");
+      td.appendChild(removeBtn);
+      
+      //tr要素を作成し、カート削除ボタン配置済のtdを子要素として追加する
+      tr.appendChild(td);
+      
+      const tbody = document.querySelector("#cart tbody");
+      tbody.appendChild(tr);
+    });
+    }
+    
+    function removeGart(event) {
+      
+      const tr = event.target.parentelement.parentElement;
+      
+      const tdList = tr.querySelectorAll("td");
+      
+      const id = tdList.filter(cart =>{
+        return cart.id !== id;
+      });
+      
+      while (tr.lastChild){
+        tr.removeChild(tr.lastChild);
+      }
+    }
+    
+  
 </script>
+
 
 </head>
 <body>

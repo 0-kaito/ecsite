@@ -11,12 +11,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.gson.Gson; 
+import com.google.gson.Gson;
+
 import jp.co.internous.ecsite.model.domain.MstGoods;
 import jp.co.internous.ecsite.model.domain.MstUser;
+import jp.co.internous.ecsite.model.form.CartForm;
 import jp.co.internous.ecsite.model.form.LoginForm;
 import jp.co.internous.ecsite.model.mapper.MstGoodsMapper;
 import jp.co.internous.ecsite.model.mapper.MstUserMapper;
+import jp.co.internous.ecsite.model.mapper.TblPurchaseMapper;
 
 @Controller
 @RequestMapping("/ecsite")
@@ -27,6 +30,9 @@ public class IndexController {
 	
 	@Autowired
 	private MstUserMapper userMapper;
+	
+	@Autowired
+	private TblPurchaseMapper purchaseMapper;
 	
 	private Gson gson = new Gson();
 	
@@ -50,4 +56,18 @@ public class IndexController {
 		
 		return gson.toJson(user);
 	}
+	
+	@ResponseBody
+	@PostMapping("/api/purchase")
+	public int purchaseApi(@RequestBody CartForm f) {
+		
+	    f.getCartList().forEach((c) -> {
+	        int total = c.getPrice() * c.getCount();
+	        purchaseMapper.insert(f.getUserId(), c.getId(), c.getGoodsName(), c.getCount(), total);
+	    });
+
+	    return f.getCartList().size();
+	}
+
+	
 }

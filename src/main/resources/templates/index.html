@@ -15,9 +15,10 @@ document.addEventListener('DOMContentLoaded', event => {
     cartBtns.forEach((btn) => {
         btn.addEventListener("click", addCart);
     });
+    });
     
     //id="purchaseBtn" を持つ要素にて "click" イベントが発火した際　purchase関数を呼び出す
-    document.getElementById("ourchaseBtn").addEventListener("click",purchase);
+    document.getElementById("purchaseBtn").addEventListener("click",purchase);
     
     /*
      *purchase関数
@@ -31,19 +32,22 @@ document.addEventListener('DOMContentLoaded', event => {
         */
         const postObj ={
           "userId": document.getElementById("hiddenUserId").value,
-          "cartList": cartList
+"cartList": cartList
+
           
         };
         
-        fech("/ecsite/api/purchase",{
+        fetch("/ecsite/api/purchase",{
           method: "POST",
-          headers:{"Content-Type": application/json},
-          body:JOSON.stringify(postObj),
+          headers:{"Content-Type": "application/json"},
+          body:JSON.stringify(postObj),
         })
         .then(response => response.text())
-        .then(reult =>{
+        .then(result =>{
           alert('${result}種類の商品を購入しました。');
-          const countElements = socument.queryselectorAll(".count");
+
+
+          const countElements = document.querySelectorAll(".count");
           countElements.forEach(element=>{
           element.value=0;
         });
@@ -171,7 +175,7 @@ function removeCart(event) {
 <table id="goodsListTable">
     <thead>
         <tr>
-            <th>ID</th><th>商品名</th><th>価格</th><th>注文数</th>l<th>カート</th>
+            <th>ID</th><th>商品名</th><th>価格</th><th>注文数</th><th>カート</th>
         </tr>
     </thead>
     <tbody>

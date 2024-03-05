@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class CartForm implements Serializable {
+
 	
 	private int userId; 
 	
@@ -17,7 +18,7 @@ public class CartForm implements Serializable {
 		this.userId = userId;
 	}
 	
-	public List<Cart> getCarList() {
+	public List<Cart> getCartList() {
 		return cartList;
 	}
 

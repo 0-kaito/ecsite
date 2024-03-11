@@ -1,220 +1,248 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<link href="/css/style.css" rel="stylesheet">
-<title>ECサイト</title>
+  <meta charset="UTF-8">
+  <link href="/css/style.css" rel="stylesheet">
+  <title>ECサイト</title>
+  <!-- JavaScriptは外部ファイルに分離 -->
+  <script>
+    let cartList = [];
 
-<script>
-let cartList = [];
-document.addEventListener('DOMContentLoaded', event => {
-    document.getElementById("loginForm").addEventListener("submit", login);
+    document.addEventListener('DOMContentLoaded', (event) => {
+        document.getElementById("loginForm").addEventListener("submit", login);
 
-    const cartBtns = document.querySelectorAll(".cartBtn");
+        const cartBtns = document.querySelectorAll(".cartBtn");
 
-    cartBtns.forEach((btn) => {
-        btn.addEventListener("click", addCart);
+        cartBtns.forEach((btn) => {
+            btn.addEventListener("click", addCart);
+        });
+
+        document.getElementById("purchaseBtn").addEventListener("click", purchase);
+        document.getElementById("historyBtn").addEventListener("click", showHistory);
     });
-    });
-    
-    //id="purchaseBtn" を持つ要素にて "click" イベントが発火した際　purchase関数を呼び出す
-    document.getElementById("purchaseBtn").addEventListener("click",purchase);
-    
-    /*
-     *purchase関数
-     *「購入」ボタンのclickイベントにより呼び出される
-     */
-     function purchase(event){
-       
-       /*
-        *JavaにPOST送信するオブジェクトを取得・設定する
-        *※cartListはグローバル変数
-        */
-        const postObj ={
-          "userId": document.getElementById("hiddenUserId").value,
-"cartList": cartList
 
-          
+    function showHistory(event) {
+        const postObj = {
+            "userId": document.getElementById("hiddenUserId").value
         };
-        
-        fetch("/ecsite/api/purchase",{
-          method: "POST",
-          headers:{"Content-Type": "application/json"},
-          body:JSON.stringify(postObj),
+
+        fetch("/ecsite/api/history", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(postObj),
         })
         .then(response => response.text())
-        .then(result =>{
-          alert('${result}種類の商品を購入しました。');
+        .then(result => {
+            const historyList = JSON.parse(result);
+            const tbody = document.querySelector("#history tbody");
 
+            while (tbody.lastChild) {
+                tbody.removeChild(tbody.lastChild);
+            }
 
-          const countElements = document.querySelectorAll(".count");
-          countElements.forEach(element=>{
-          element.value=0;
-        });
-        
-        //カート表のtbody内の要素をクリアにする
-        initCart();
-        //グローバル変数cartListをクリアする
-        cartList = [];
+            historyList.forEach((history, index) => {
+                const tr = document.createElement("tr");
+
+                const keys = ["goodsName", "itemCount", "createdAt"];
+
+                for (key of keys) {
+                    const td = document.createElement("td");
+                    td.innerText = history[key];
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr);
+            });
         })
-        .catch(error =>{
-          console.error("Error:",error)  
-     });
-       }
-
-function initCart() {
-    const tbody = document.querySelector("#cart tbody");
-    while (tbody.lastChild) {
-        tbody.removeChild(tbody.lastChild);
+        .catch(error => {
+            console.error("Error:", error);
+        });
     }
-}
 
-function login(event) {
-    event.preventDefault();
+    function purchase(event) {
+        const postObj = {
+            "userId": document.getElementById("hiddenUserId").value,
+            "cartList": cartList
+        };
 
-    initCart();
-    cartList = [];
+        fetch("/ecsite/api/purchase", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(postObj),
+        })
+        .then(response => response.text())
+        .then(result => {
+            alert(`${result}種類の商品を購入しました.`);
 
-    const postObj = {
-        "userName": document.querySelector("input[name=userName]").value,
-        "password": document.querySelector("input[name=password]").value,
-    };
+            const countElements = document.querySelectorAll(".count");
+            countElements.forEach(element => {
+                element.value = 0;
+            });
 
-    fetch("/ecsite/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(postObj),
-    })
-    .then(response => response.text())
-    .then(result => {
-        const user = JSON.parse(result);
-        document.getElementById("welcome").innerText = `ようこそ！ ${user.fullName} さん`;
-        document.getElementById("hiddenUserId").value = user.id;
-        document.querySelector("input[name=userName]").value = "";
-        document.querySelector("input[name=password]").value = "";
-    })
-    .catch(error => {
-        console.error("Error", error);
-    });
-}
+            initCart();
+            cartList = [];
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    }
 
-function addCart(event) {
-    const tdList = event.target.parentElement.parentElement.querySelectorAll("td");
+    function initCart() {
+        const tbody = document.querySelector("#cart tbody");
+        while (tbody.lastChild) {
+            tbody.removeChild(tbody.lastChild);
+        }
+    }
 
-    const goodsInfo = {
-        "id": tdList.item(0).innerText,
-        "goodsName": tdList.item(1).innerText,
-        "price": tdList.item(2).innerText,
-        "count": tdList.item(3).querySelector("input").value
-    };
+    function login(event) {
+        event.preventDefault();
 
-    if (goodsInfo.count === "0" || goodsInfo.count === "") {
-        alert("注文数0または空欄です。");
+        initCart();
+        cartList = [];
+
+        const postObj = {
+            "userName": document.querySelector("input[name=userName]").value,
+            "password": document.querySelector("input[name=password]").value,
+        };
+
+        fetch("/ecsite/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(postObj),
+        })
+        .then(response => response.text())
+        .then(result => {
+            const user = JSON.parse(result);
+            document.getElementById("welcome").innerText = `ようこそ！ ${user.fullName} さん`;
+            document.getElementById("hiddenUserId").value = user.id;
+            document.querySelector("input[name=userName]").value = "";
+            document.querySelector("input[name=password]").value = "";
+        })
+        .catch(error => {
+            console.error("Error", error);
+        });
+    }
+
+    function addCart(event) {
+      
+      //ログイン状態の確認
+      if (document.getElementById("hiddenUserId").value === "0"){
+        alert("ログインしてください");
         return;
-    }
+      }
+      
+      
+        const tdList = event.target.parentElement.parentElement.querySelectorAll("td");
 
-    cartList.push(goodsInfo);
-    initCart();
+        const goodsInfo = {
+            "id": tdList.item(0).innerText,
+            "goodsName": tdList.item(1).innerText,
+            "price": tdList.item(2).innerText,
+            "count": tdList.item(3).querySelector("input").value
+        };
 
-    cartList.forEach(cart => {
-        const tr = document.createElement("tr");
-
-        for ([key, value] of Object.entries(cart)) {
-            const td = document.createElement("td");
-            td.innerText = value;
-            tr.appendChild(td);
+        if (goodsInfo.count === "0" || goodsInfo.count === "") {
+            alert("注文数0または空欄です。");
+            return;
         }
 
-        const removeBtn = document.createElement("button");
-        removeBtn.innerText = "カート削除";
-        removeBtn.setAttribute("class", "removeBtn");
-        removeBtn.addEventListener("click", removeCart);
+        cartList.push(goodsInfo);
+        initCart();
 
-        const td = document.createElement("td");
-        td.appendChild(removeBtn);
+        cartList.forEach(cart => {
+            const tr = document.createElement("tr");
 
-        tr.appendChild(td);
+            for ([key, value] of Object.entries(cart)) {
+                const td = document.createElement("td");
+                td.innerText = value;
+                tr.appendChild(td);
+            }
 
-        const tbody = document.querySelector("#cart tbody");
-        tbody.appendChild(tr);
-    });
-}
+            const removeBtn = document.createElement("button");
+            removeBtn.innerText = "カート削除";
+            removeBtn.setAttribute("class", "removeBtn");
+            removeBtn.addEventListener("click", removeCart);
 
-function removeCart(event) {
-    const tr = event.target.parentElement.parentElement;
-    const tdList = tr.querySelectorAll("td");
-    const id = tdList.item(0).innerText;
+            const td = document.createElement("td");
+            td.appendChild(removeBtn);
 
-    cartList = cartList.filter(cart =>  {
-      
-      return  cart.id !== id;
-    });
-    
-    while (tr.lastChild) {
-      tr.removeChild(tr.lastChild);
+            tr.appendChild(td);
+
+            const tbody = document.querySelector("#cart tbody");
+            tbody.appendChild(tr);
+        });
     }
-    
-   
-}
-</script>
+
+    function removeCart(event) {
+        const tr = event.target.parentElement.parentElement;
+        const tdList = tr.querySelectorAll("td");
+        const id = tdList.item(0).innerText;
+
+        cartList = cartList.filter(cart => cart.id !== id);
+
+        while (tr.lastChild) {
+            tr.removeChild(tr.lastChild);
+        }
+    }
+  </script>
 </head>
 <body>
-<header>
+  <header>
     <h1>ECサイト</h1>
     <div>
-        <form name="loginForm" id="loginForm" method="post" action="#">
-            ユーザー名:<input type="text" name="userName" />
-            パスワード:<input type="password" name="password" />
-            <button type="submit">ログイン</button>
-        </form>
-        <span id="welcome">ようこそ！　ゲストさん</span>
-        <input type="hidden" id="hiddenUserId" value="0" />
+      <form name="loginForm" id="loginForm" method="post" action="#">
+        ユーザー名:<input type="text" name="userName" />
+        パスワード:<input type="password" name="password" />
+        <button type="submit">ログイン</button>
+      </form>
+      
+      <span id="welcome">ようこそ！ ゲストさん<a href="/ecsite/signup">(新規登録はこちら)</a></span>
+      <input type="hidden" id="hiddenUserId" value="0" />
     </div>
-</header>
+  </header>
 
-<table id="goodsListTable">
+  <table id="goodsListTable">
     <thead>
-        <tr>
-            <th>ID</th><th>商品名</th><th>価格</th><th>注文数</th><th>カート</th>
-        </tr>
+      <tr>
+        <th>ID</th><th>商品名</th><th>価格</th><th>注文数</th><th>カート</th>
+      </tr>
     </thead>
     <tbody>
-        <tr th:each="item: ${goods}">
-            <td th:text="${item.id}" />
-            <td th:text="${item.goodsName}" />
-            <td th:text="${item.price}" />
-            <td><input type="number" class="count" value="0"/></td>
-            <td><button class="cartBtn">カートに入れる</button></td>
-        </tr>
+      <tr th:each="item: ${goods}">
+        <td th:text="${item.id}" />
+        <td th:text="${item.goodsName}" />
+        <td th:text="${item.price}" />
+        <td><input type="number" class="count" value="0" /></td>
+        <td><button class="cartBtn">カートに入れる</button></td>
+      </tr>
     </tbody>
-</table>
+  </table>
 
-<fieldset>
+  <fieldset>
     <legend>カート</legend>
     <table id="cart">
-        <thead>
-            <tr>
-                <th>ID</th><th>商品名</th><th>価格</th><th>注文数</th><th>カート</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
+      <thead>
+        <tr>
+          <th>ID</th><th>商品名</th><th>価格</th><th>注文数</th><th>カート</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
     </table>
     <button id="purchaseBtn">購入</button>
-</fieldset>
+  </fieldset>
 
-<fieldset>
+  <fieldset>
     <legend>購入履歴</legend>
     <table id="history">
-        <thead>
-            <tr>
-                <th>商品名</th><th>注文数</th><th>購入日時</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
+      <thead>
+        <tr>
+          <th>商品名</th><th>注文数</th><th>購入日時</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
     </table>
     <button id="historyBtn">履歴を表示</button>
-</fieldset>
+  </fieldset>
 </body>
 </html>

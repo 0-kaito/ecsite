@@ -1,17 +1,25 @@
 package jp.co.internous.ecsite.model.domain;
 
+import java.sql.Timestamp;
+
 public class TblPurchase {
 
 	
-private int id;
+   private int id;
+   
+   private int userId;
+   
+   private int goodsId;
 	
-	private String userName;
+	private String goodsName;
 	
-	private String password;
+	private int itemCount;
 	
-	private String fullName;
+	private int total;
 	
-	private int isAdmin;
+	private Timestamp createdAt;
+	
+	
 	
 	public int getId() {
 		return id;
@@ -20,29 +28,41 @@ private int id;
 	public void setId(int id) {
 		this.id =id;
 	}
-	 public String getUserName() {
-	        return userName;
+	 public int getUserId() {
+	        return userId;
 }
-	  public void setUserName(String userName) {
-	        this.userName = userName;
+	  public void setUserId(int userId) {
+	        this.userId = userId;
 	    }
-	   public String getPassword() {
-	        return password;
+	   public int getGoodsId() {
+	        return goodsId;
 	    }
-	   public void setPassword(String password) {
-	        this.password = password;
+	   public void setGoodsId(int goodsId) {
+	        this.goodsId = goodsId;
 	    }
-	   public String getFullName() {
-	        return fullName;
+	   public String getGoodsName() {
+	        return goodsName;
 	    }
-	   public void setFullName(String fullName) {
-	        this.fullName = fullName;
+	   public void setGoodsName(String GoodsName) {
+	        this.goodsName = goodsName;
 	    }
-	   public int getIsAdmin() {
-	        return isAdmin;
+	   public int getItemCount() {
+	        return itemCount;
 	    }
-	   public void setIsAdmin(int isAdmin) {
-	        this.isAdmin = isAdmin;
+	   public void setItemCount(int itemCount) {
+	        this.itemCount = itemCount;
 	    }
+	   public int getTotal() {
+			return total;
+		}
+	   public void setTotal(int total) {
+	        this.total = total;
+	    }
+	   public Timestamp getCreatedAt() {
+		   return createdAt;
+	   }
+	   public void setCreatedAt(Timestamp createdAt) {
+		   this.createdAt = createdAt;
+	   }
 }
 

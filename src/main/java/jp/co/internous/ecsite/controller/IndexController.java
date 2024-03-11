@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,8 +14,11 @@ import com.google.gson.Gson;
 
 import jp.co.internous.ecsite.model.domain.MstGoods;
 import jp.co.internous.ecsite.model.domain.MstUser;
+import jp.co.internous.ecsite.model.dto.HistoryDto;
 import jp.co.internous.ecsite.model.form.CartForm;
+import jp.co.internous.ecsite.model.form.HistoryForm;
 import jp.co.internous.ecsite.model.form.LoginForm;
+import jp.co.internous.ecsite.model.form.UserForm;
 import jp.co.internous.ecsite.model.mapper.MstGoodsMapper;
 import jp.co.internous.ecsite.model.mapper.MstUserMapper;
 import jp.co.internous.ecsite.model.mapper.TblPurchaseMapper;
@@ -36,7 +38,7 @@ public class IndexController {
 	
 	private Gson gson = new Gson();
 	
-	@GetMapping("/")
+	@RequestMapping("/")
 	public String index(Model model) {
 		List<MstGoods> goods = goodsMapper.findAll();
 		model.addAttribute("goods", goods);
@@ -69,5 +71,54 @@ public class IndexController {
 	    return f.getCartList().size();
 	}
 
+	@ResponseBody
+	@PostMapping("/api/history")
+	public String historyApi(@RequestBody HistoryForm f) {
+		int userId = f.getUserId();
+		List<HistoryDto>history = purchaseMapper.findHistory(userId);
+		
+		return gson.toJson(history);
+	}
 	
+	
+	
+	
+	
+	
+	@RequestMapping("/signup")
+	public String signup() {
+		return "signup";
+	}
+	
+	@PostMapping("/register")
+	public String register(UserForm userForm, Model model) {
+	    MstUser registertedUser = userMapper.findByUser(userForm);
+
+	    model.addAttribute("userName", userForm.getUserName());
+	    model.addAttribute("fullName", userForm.getFullName());
+	    model.addAttribute("password", userForm.getPassword());
+	    
+	    if (userForm.getUserName().equals("") || userForm.getFullName().equals("") || userForm.getPassword().equals("")) {
+	        model.addAttribute("errMessage", "全ての項目を入力してください。");
+
+	   
+	        return "forward:/ecsite/signup";
+	    }
+
+	    if (registertedUser != null) {
+	        model.addAttribute("errMessage", "このユーザー名はすでに使用されています。");
+	      
+	        return "forward:/ecsite/signup";
+	    }
+
+	    MstUser user = new MstUser();
+	    user.setUserName(userForm.getUserName());
+	    user.setFullName(userForm.getFullName());
+	    user.setPassword(userForm.getPassword());
+
+	    userMapper.insert(user);
+
+	    return "forward:/ecsite/";
+	}
+
 }

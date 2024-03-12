@@ -168,5 +168,10 @@ table#admintable thead tr th:nth-child(4) {
     color: red;
   }
   
- 
+ .signBtn {
+   color:white
+ }
   
+  .signupPage{
+    margin: 0 30px;
+  }
